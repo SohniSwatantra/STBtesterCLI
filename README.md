@@ -32,6 +32,22 @@ For commercial support and turn-key test rigs, see <https://stb-tester.com>.
 To build your own test rig hardware, and for community-supported documentation
 and mailing list, see the [wiki], in particular [Getting Started].
 
+## Claude Code MCP Integration
+
+This fork includes an MCP (Model Context Protocol) server that allows Claude Code to directly control STB Tester devices through natural conversation.
+
+### Quick Start
+
+1. Copy `.mcp.json.example` to `.mcp.json` and add your Portal credentials
+2. Ask Claude: "List available STB Tester devices"
+3. Ask Claude: "Connect to [device-id] and take a screenshot"
+
+### Documentation
+
+- **[MCP Usage Guide](MCP_USAGE_GUIDE.md)** - Workflows, prompting examples, and quick reference
+- **[MCP Server README](mcp_server/README.md)** - Detailed API documentation and setup
+- **[CLAUDE.md](CLAUDE.md)** - Test generation workflow instructions
+
 
 [LICENSE]: https://github.com/stb-tester/stb-tester/blob/master/LICENSE
 [Python API documentation]: http://stb-tester.com/manual/python-api

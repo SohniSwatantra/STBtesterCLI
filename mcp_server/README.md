@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server that exposes STB Tester APIs as tools. This allows Claude Code, Claude Desktop, and other MCP-compatible clients to control set-top boxes and perform automated testing.
 
+> **New to MCP?** See the **[MCP Usage Guide](../MCP_USAGE_GUIDE.md)** for workflows, prompting examples, and a quick reference card.
+
 ## Features
 
 - **Remote Device Control**: Connect to real STB Tester nodes by device ID via Portal API
