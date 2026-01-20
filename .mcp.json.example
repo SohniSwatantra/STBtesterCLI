@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "stb-tester": {
+      "command": "python",
+      "args": ["mcp_server/stb_tester_server.py"],
+      "env": {
+        "PYTHONPATH": ".",
+        "STBT_PORTAL_URL": "https://your-company.stb-tester.com",
+        "STBT_PORTAL_TOKEN": "your-api-token-here",
+        "STBT_DEFAULT_DEVICE": "your-device-id"
+      }
+    }
+  }
+}

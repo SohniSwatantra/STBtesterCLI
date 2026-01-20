@@ -1,0 +1,53 @@
+*.pyc
+*.rpm
+*.srpm
+*_orc.c
+*_orc.h
+.cache
+.DS_Store
+.github/workflows/.*.built
+.stbt-cflags
+.stbt-ldflags
+.stbt-prefix
+.venv
+__pycache__
+_stbt/libstbt.*.so
+debian-packages
+docs/stbt.1
+dist/
+etc/stbt.conf
+extra/debian/changelog
+extra/fedora/stb-tester.spec
+extra/stb-tester*.debian.tar.xz
+rpmbuild
+stb-tester-*.tar.gz
+stb-tester_*.deb
+stbt-control-relay
+stbt-controlc
+stbt-debug
+stbt_core.egg-info/
+TAGS
+tests/stbt-debug-expected-output/*/*/*.png
+tests/test-install
+VERSION
+
+# STB Test Generation Workflow
+ralph-claude-code-main/
+*.log
+.env
+*.tmp
+
+# MCP config with API tokens (use .mcp.json.example as template)
+.mcp.json
+
+# Claude settings
+.claude/
+
+# Test screenshots and videos (large files)
+*.mp4
+device_screenshot.png
+eosv1_screenshot_*.png
+eosv2_test_*.png
+test_result_*.jpg
+test_result_*.mp4
+video_frames/

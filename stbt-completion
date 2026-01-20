@@ -1,0 +1,333 @@
+# Bash tab-completion for stb-tester.               -*- shell-script -*-
+
+# Copyright 2012 David Rothlisberger <david@rothlis.net>
+# Copyright 2012-2013 YouView TV Ltd.
+# License: LGPL v2.1 or (at your option) any later version (see
+# https://github.com/stb-tester/stb-tester/blob/master/LICENSE for details).
+
+complete -o nospace -F _stbt stbt
+complete -o nospace -F _stbt_run stbt_run.py
+
+_stbt() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local IFS=$'\n'
+    if [ $COMP_CWORD = 1 ]; then
+        COMPREPLY=($(compgen \
+            -W "$(_stbt_trailing_space --help --version \
+                    config \
+                    control \
+                    lint \
+                    power \
+                    run \
+                    screenshot \
+                    match \
+                    tv)" \
+            -- "$cur"))
+    else
+        case "${COMP_WORDS[1]}" in
+            config)   _stbt_config;;
+            control)  _stbt_control;;
+            lint)     _stbt_lint;;
+            power)    _stbt_power;;
+            run)      _stbt_run;;
+            match)    _stbt_match;;
+            *)        COMPREPLY=();;
+        esac
+    fi
+}
+
+_stbt_run() {
+    _stbt_get_prev
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+    case "$prev" in
+        --control=*) COMPREPLY=($(_stbt_control_uri));;
+        --source-pipeline=*) COMPREPLY=();;
+        --sink-pipeline=*) COMPREPLY=();;
+        --save-video=*) COMPREPLY=($(_stbt_filenames "$cur"));;
+        *) COMPREPLY=(
+                $(compgen -W "$(_stbt_trailing_space \
+                        --help --verbose --save-video \
+                        --control --source-pipeline --sink-pipeline)" \
+                    -- "$cur")
+                $(_stbt_filename_possibly_with_test_functions));;
+    esac
+}
+
+_stbt_config() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD-1]}"
+    if [ $COMP_CWORD -eq 2 ]; then
+        COMPREPLY=($(compgen \
+            -W "$(_stbt_trailing_space --help $(_stbt_config_keys))" \
+            -- "$cur"))
+    fi
+}
+
+_stbt_control() {
+    _stbt_get_prev
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+
+    case "$prev" in
+        --keymap=*) COMPREPLY=($(_stbt_filenames "$cur"));;
+        --control=*) COMPREPLY=($(_stbt_control_uri));;
+        *) COMPREPLY=($(compgen -W "$(_stbt_trailing_space \
+                            --help --help-keymap --keymap --control)" \
+                        -- "$cur"));;
+    esac
+}
+
+_stbt_lint() {
+    declare -F _pylint &>/dev/null || return  # Provided by bash-completion
+    _pylint pylint
+}
+
+_stbt_power() {
+    _stbt_get_prev
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+
+    case "$prev" in
+        --power-outlet=*) COMPREPLY=($(_stbt_power_outlet_uri));;
+        *) COMPREPLY=($(compgen -W "$(_stbt_trailing_space \
+                            --help --power-outlet on off status)" \
+                        -- "$cur"));;
+    esac
+}
+
+_stbt_match() {
+    _stbt_get_prev
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+    local v
+    [[ $COMP_CWORD -gt 2 && ${COMP_WORDS[2]} == "-v" ]] && v="-v" || v=
+    [[ ${COMP_WORDS[2]} == "--help" ]] && return
+
+    case "$v,$COMP_CWORD" in
+        ,2) COMPREPLY=($(compgen \
+                -f -W "$(_stbt_trailing_space --help -v)" \
+                -- "$cur"));;
+        *,3|-v,4) COMPREPLY=($(_stbt_filenames "$cur"));;
+        ,4|*,*)
+            case "$prev" in
+                match_method=) COMPREPLY=($(compgen \
+                    -W "$(_stbt_trailing_space \
+                            sqdiff-normed ccorr-normed ccoeff-normed)" \
+                    -- "$cur"));;
+                confirm_method=) COMPREPLY=($(compgen \
+                    -W "$(_stbt_trailing_space none absdiff normed-absdiff)" \
+                    -- "$cur"));;
+                match_threshold=|erode_passes=|confirm_threshold=)
+                    COMPREPLY=();;
+                *) COMPREPLY=($(compgen \
+                    -W "$(_stbt_no_space \
+                            match_method= match_threshold= \
+                            confirm_method= erode_passes= confirm_threshold=)" \
+                    -- "$cur"));;
+            esac
+    esac
+}
+
+## arguments to command-line options
+############################################################################
+
+_stbt_control_uri() {
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+    case "$prev" in
+        --control=irnetbox:*:*:) _stbt_irnetbox_config;;
+        --control=irnetbox:*:) _stbt_irnetbox_output;;
+        --control=irnetbox:) _stbt_hostname;;
+        --control=lirc:*:*:) _stbt_lirc_name;;
+        --control=lirc:*:) _stbt_lirc_port_or_name;;
+        --control=lirc:) _stbt_lirc_socket_or_port_or_hostname;;
+        --control=rfb:*:) _stbt_rfb_port;;
+        --control=rfb:) _stbt_hostname;;
+        --control=samsung:*) _stbt_hostname;;
+        *)
+            compgen -W "$( \
+                    _stbt_no_space irnetbox: lirc: rfb: samsung: x11:
+                    _stbt_trailing_space none test)" \
+                -- "$cur";;
+    esac
+}
+
+_stbt_irnetbox_output() {
+    local cur="$_stbt_cur"
+    compgen -S ":" -W "$(
+            _stbt_no_space 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)" \
+        -- "$cur"
+}
+
+_stbt_irnetbox_config() {
+    local cur="$_stbt_cur"
+    _stbt_filenames "$cur"
+}
+
+_stbt_lirc_socket_or_port_or_hostname() {
+    local cur="$_stbt_cur"
+    compgen -W "$(_stbt_no_space $(_lirc_tcp_ports))" -- "$cur"
+    compgen -f -S ":" -- "$cur"
+    compgen -A hostname -S ":" -- "$cur"
+}
+
+_stbt_lirc_port_or_name() {
+    local cur="$_stbt_cur"
+    compgen -W "$(_stbt_no_space $(_lirc_tcp_ports))" -- "$cur"
+    compgen -W "$(_stbt_trailing_space $(_lirc_remote_names))" -- "$cur"
+}
+
+_stbt_lirc_name() {
+    local cur="$_stbt_cur"
+    compgen -W "$(_stbt_trailing_space $(_lirc_remote_names))" -- "$cur"
+}
+
+_stbt_hostname() {
+    local cur="$_stbt_cur"
+    compgen -A hostname -S ":" -- "$cur"
+}
+
+_stbt_rfb_port() {
+    local cur="$_stbt_cur"
+    compgen -W "$(_stbt_trailing_space 5900)" -- "$cur"
+}
+
+_stbt_config_keys() {
+    stbt config --bash-completion ""
+}
+
+_stbt_power_outlet_uri() {
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+    case "$prev" in
+        --power-outlet=*:*:) _stbt_power_outlet_outlet;;
+        --power-outlet=*:) _stbt_hostname;;
+        *) compgen -W "$(_stbt_no_space ipp: pdu:)" -- "$cur";;
+    esac
+}
+
+_stbt_power_outlet_outlet() {
+    local prev="$_stbt_prev"
+    case "$prev" in
+        --power-outlet=pdu:*)
+            compgen -W "$(_stbt_trailing_space \
+                    1-A1 1-A2 1-A3 1-A4 1-A5 1-A6 1-A7 1-A8)" \
+                -- "$cur";;
+    esac
+}
+
+## Helper functions
+############################################################################
+
+# When you type a python filename that doesn't have any functions named "test_",
+# completes the filename followed by a space;
+# otherwise completes the filename followed by "::" followed by the function
+# name followed by a space.
+#
+# Before you've typed ":":
+# * cur == the filename you've typed so far (e.g. test_something.p)
+#
+# After you've typed ":" or "::":
+# * prev = filename name + ":" or "::" (e.g. test_something.py::)
+# * cur = the function name you've typed so far
+#
+# See test cases in _stbt_test_filename_possibly_with_test_functions, below.
+# Note that COMP_WORDBREAKS by default includes "=" and ":".
+_stbt_filename_possibly_with_test_functions() {
+    local cur="$_stbt_cur"
+    local prev="$_stbt_prev"
+    local test_re='^def test_.*( *) *:'
+    local filename
+
+    [[ "$prev" =~ \.py::?$ ]] && filename="$prev" || filename="$cur"
+    filename=${filename%:}; filename=${filename%:}  # abc.py:: => abc.py
+
+    {
+        # Files with test functions:
+        _stbt_trailing_space $(
+            compgen -f -X '!*.py' -- "$filename" |
+            xargs --no-run-if-empty grep -H "$test_re" |
+            sed -e 's/:def */::/' -e 's/ *( *) *:.*//')
+
+        # Files without test functions:
+        _stbt_trailing_space $(
+            compgen -f -X '!*.py' -- "$filename" |
+            xargs --no-run-if-empty grep -L "$test_re")
+
+        # Directories:
+        compgen -d -S/ -- "$filename"
+    } |
+    if [[ "$prev" =~ \.py::?$ ]]; then
+        sed -n "s,^$prev$cur,$cur,p"
+    else
+        cat
+    fi
+}
+
+# Returns filenames and directories, appending a slash to directory names.
+_stbt_filenames() {
+    # Files, excluding directories:
+    grep -v -F -f <(compgen -d -P ^ -S '$' -- "$1") \
+        <(compgen -f -P ^ -S '$' -- "$1") |
+    sed -e 's/^\^//' -e 's/\$$/ /'
+
+    # Directories:
+    compgen -d -S / -- "$1"
+}
+
+# Walks backward from the current word, collecting the entire preceding
+# flag and its argument:
+#     "stbt run --control lirc::name..." => _stbt_prev="--control=lirc::"
+# See test cases in _stbt_test_get_prev, below.
+# Note that COMP_WORDBREAKS by default includes "=" and ":".
+_stbt_get_prev() {
+    local c p pp i
+    c="${COMP_WORDS[COMP_CWORD]}"
+    p="$c"
+    i=$((COMP_CWORD-1))
+    while [ $i -gt 1 ]; do
+        pp="${COMP_WORDS[i]}"  # the word previous to $p
+        case "$pp,$p" in
+            [=:],*|::,*|*,[=:]*) p="$pp$p";;
+            *) _stbt_takes_arg "$pp" || break; p="$pp=$p";;
+        esac
+        i=$((i-1))
+    done
+    [[ "$c" == ":" || "$c" == "::" || "$c" == "=" ]] && c=""
+    p="${p%$c}"
+    _stbt_cur="$c"
+    _stbt_prev="$p"
+}
+
+_stbt_takes_arg() {
+    case "$1" in
+        --control|--source-pipeline|--sink-pipeline) true;;
+        --save-video) true;;
+        -o|--output-file) true;;
+        --keymap) true;;
+        --power-outlet) true;;
+        *) false;;
+    esac
+}
+
+_stbt_trailing_space() {
+    local c
+    for c in $*; do printf -- "$c \n"; done
+}
+
+_stbt_no_space() {
+    local c
+    for c in $*; do printf -- "$c\n"; done
+}
+
+_lirc_tcp_ports() {
+    ps ax | grep 'lircd' | \
+        perl -nle 'print $1 if (/--listen=(\d+)/ || /-l +(\d+)/)' | sort
+}
+
+_lirc_remote_names() {
+    cat /etc/lirc/lircd.conf 2>/dev/null |
+    awk '/^begin remote/         { inremote = 1 }
+         inremote && /^ *name /  { print $2; inremote = 0 }'
+}

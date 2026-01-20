@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Copyright 2013 YouView TV Ltd.
+# License: LGPL v2.1 or (at your option) any later version (see
+# https://github.com/stb-tester/stb-tester/blob/master/LICENSE for details).
+
+#/ usage: stbt screenshot [-h] [filename]
+#/
+#/ Capture a screenshot from the device-under-test to the specified filename
+#/ (defaults to 'screenshot.png'), using the GStreamer source pipeline
+#/ specified in your stbt config file.
+#/
+#/ Options:
+#/   -h, --help     Show this help message and exit.
+
+[[ "$1" == -h || "$1" == --help ]] && { grep '^#/' "$0" | cut -c4-; exit 0; }
+
+filename=${1:-screenshot.png}
+
+"$(dirname "$0")/stbt_run.py" -v --control=none --save-video= <(cat <<-EOF
+	import time, stbt_core as stbt
+	stbt.get_frame()
+	if stbt._dut._display.source_pipeline_description.startswith("decklink"):
+	    time.sleep(2)  # First second of Blackmagic video has purple tint
+	stbt.save_frame(stbt.get_frame(), "$filename")
+	print("Screenshot saved to '$filename'")
+	EOF
+    )

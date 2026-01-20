@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "stb-tester": {
+      "command": "python",
+      "args": [
+        "/path/to/stb-tester-main/mcp_server/stb_tester_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/path/to/stb-tester-main"
+      }
+    }
+  }
+}
