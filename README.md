@@ -1,4 +1,4 @@
-# stb-tester
+# STBtesterCLI - STB Tester with Claude Code Integration
 
 **Automated User Interface Testing for Set-Top Boxes & Smart TVs**
 
