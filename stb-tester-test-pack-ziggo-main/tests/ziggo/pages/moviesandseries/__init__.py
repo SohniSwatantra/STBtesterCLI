@@ -1,1 +1,0 @@
-from .moviesandseries import MoviesAndSeries
