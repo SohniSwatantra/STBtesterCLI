@@ -1,0 +1,10 @@
+*.pyc
+.env
+.pytest_cache/
+.venv/
+.venv*/
+venv/
+.vscode/
+__pycache__/
+stbt-debug/
+artifacts/
