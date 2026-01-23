@@ -1,0 +1,15 @@
+#!/bin/bash
+# STB Tester AI CLI Launcher
+#
+# Usage:
+#   ./stb-tester-ai
+#
+# Or set environment variables first:
+#   export STBT_PORTAL_URL="https://your-company.stb-tester.com"
+#   export STBT_PORTAL_TOKEN="your-token"
+#   ./stb-tester-ai
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Run the CLI
+python3 -m stb_tester_cli

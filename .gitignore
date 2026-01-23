@@ -51,3 +51,16 @@ eosv2_test_*.png
 test_result_*.jpg
 test_result_*.mp4
 video_frames/
+
+# Local test projects (use separate repos for these)
+stb-test-automation/
+stb-tester-test-pack-ziggo/
+stb-tester-ui/
+stb-tests/
+stb_tests/
+
+# Video files
+video*.mp4
+
+# Reference images (managed separately)
+reference_images/
