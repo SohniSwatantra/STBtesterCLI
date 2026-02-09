@@ -35,6 +35,99 @@ curl -s -X POST 'https://ziggo.stb-tester.com/api/v2/run_tests' \
 
 ---
 
+## Web Applications
+
+**IMPORTANT:** When asked to "run the app" or "start the servers", start BOTH web applications:
+
+### Available Web Apps
+
+| App | URL | Port | Description |
+|-----|-----|------|-------------|
+| **STB Tester UI** | http://localhost:5177 | 5177 | Basic device control UI |
+| **STB Tester CLI UI** | http://127.0.0.1:8765 | 8765 | AI-powered CLI in browser (Claude SDK) |
+
+### Start Commands
+
+**1. STB Tester UI (Port 5177):**
+```bash
+cd stb-tester-ui
+python3 -m http.server 5177 --directory dist
+```
+
+**2. STB Tester CLI UI (Port 8765):**
+```bash
+cd /Users/swatantrasohni/Downloads/stb-tester-main
+STBT_PORTAL_URL="https://ziggo.stb-tester.com" \
+STBT_PORTAL_TOKEN="cBqdzRDwYbX1LI6cmskfsycAXNAIZPSs" \
+STBT_DEVICE_ID="stb-tester-48b02d5b0ab7" \
+python -m stb_tester_ui
+```
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        WEB BROWSERS                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   http://localhost:5177          http://127.0.0.1:8765          │
+│   ┌─────────────────────┐        ┌─────────────────────┐        │
+│   │   STB Tester UI     │        │  STB Tester CLI UI  │        │
+│   │   (Basic Control)   │        │  (AI Chat + Control)│        │
+│   │                     │        │                     │        │
+│   │  - Device Control   │        │  - Natural Language │        │
+│   │  - Screenshots      │        │  - AI Assistant     │        │
+│   │  - Key Presses      │        │  - Test Generation  │        │
+│   └─────────────────────┘        └─────────────────────┘        │
+│            │                              │                      │
+│            │                              ▼                      │
+│            │                    ┌─────────────────────┐         │
+│            │                    │  Claude Agent SDK   │         │
+│            │                    │  (AI Assistant)     │         │
+│            │                    └─────────────────────┘         │
+│            │                              │                      │
+└────────────┼──────────────────────────────┼──────────────────────┘
+             │                              │
+             └──────────────┬───────────────┘
+                            │
+                            ▼
+             ┌─────────────────────────────────┐
+             │      STB Tester Portal API      │
+             │    ziggo.stb-tester.com         │
+             │                                 │
+             │    Device: EOSv2_PROD           │
+             │    ID: stb-tester-48b02d5b0ab7  │
+             └─────────────────────────────────┘
+                            │
+                            ▼
+             ┌─────────────────────────────────┐
+             │      Physical Set-Top Box       │
+             │         (Ziggo EOS)             │
+             └─────────────────────────────────┘
+```
+
+### CLI UI Features (Port 8765)
+
+The AI-powered CLI UI includes:
+- **Natural Language Control** - Talk to your STB device naturally
+- **Real-time Terminal Mirror** - See exact CLI input/output
+- **Quick Action Buttons** - One-click for common commands
+- **WebSocket Connection** - Live updates without refresh
+- **Test Generation** - Create pytest scripts via AI
+
+### Quick Actions Available in CLI UI
+
+| Button | Command |
+|--------|---------|
+| Help | `/help` |
+| Status | `/status` |
+| List Devices | "List available devices" |
+| Screenshot | "Take a screenshot" |
+| Navigation | HOME, UP, DOWN, LEFT, RIGHT, OK, BACK |
+| EPG | "Open EPG" |
+
+---
+
 ## Test Case Registry
 
 **IMPORTANT:** Before running any test case:
