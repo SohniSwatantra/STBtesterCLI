@@ -173,7 +173,12 @@
         }
 
         .terminal-output .input-line {
-            color: var(--accent-magenta);
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+
+        .terminal-output .user-input-text {
+            color: var(--accent-orange);
             font-weight: bold;
         }
 
@@ -451,7 +456,8 @@
                     break;
 
                 case 'input':
-                    // Input is already shown in CLI output
+                    // Show user input in orange in the terminal
+                    appendOutput(`<span class="user-input-text">🎮 You ▶ ${escapeHtml(data.text)}</span><br>`, 'input');
                     break;
 
                 case 'error':
@@ -461,6 +467,13 @@
                 default:
                     console.log('Unknown message type:', data);
             }
+        }
+
+        // Escape HTML special characters
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Append output to terminal
