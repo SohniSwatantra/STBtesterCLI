@@ -2,6 +2,138 @@
 
 This project uses Claude Code to generate STB tester test scripts from high-level requirements.
 
+## Default Device Configuration
+
+**IMPORTANT:** Always use this device for building and running test cases:
+
+| Setting | Value |
+|---------|-------|
+| **Device ID** | `stb-tester-48b02d5b0ab7` |
+| **Friendly Name** | EOSv2_PROD |
+| **Portal URL** | https://ziggo.stb-tester.com |
+| **API Token** | cBqdzRDwYbX1LI6cmskfsycAXNAIZPSs |
+
+### API Endpoints
+
+```bash
+# Screenshot
+curl -s 'https://ziggo.stb-tester.com/api/v2/nodes/stb-tester-48b02d5b0ab7/screenshot.png' \
+  -H 'Authorization: token cBqdzRDwYbX1LI6cmskfsycAXNAIZPSs' -o screenshot.png
+
+# Press Key
+curl -s -X POST 'https://ziggo.stb-tester.com/api/v2/nodes/stb-tester-48b02d5b0ab7/press' \
+  -H 'Authorization: token cBqdzRDwYbX1LI6cmskfsycAXNAIZPSs' \
+  -H 'Content-Type: application/json' \
+  -d '{"key": "KEY_MENU"}'
+
+# Run Test
+curl -s -X POST 'https://ziggo.stb-tester.com/api/v2/run_tests' \
+  -H 'Authorization: token cBqdzRDwYbX1LI6cmskfsycAXNAIZPSs' \
+  -H 'Content-Type: application/json' \
+  -d '{"node_id": "stb-tester-48b02d5b0ab7", "test_pack_revision": "main", "test_cases": ["tests/example.py::test_name"]}'
+```
+
+---
+
+## Test Case Registry
+
+**IMPORTANT:** Before running any test case:
+1. **Grounding:** Verify the test case name exists in this registry
+2. **Check path:** Use the correct file path from the registry
+3. **Run:** Execute via Portal API or `stbt run`
+
+When creating new test cases:
+1. Build and test the new test case
+2. Commit to GitHub repository
+3. **ADD the new test case to this registry below**
+
+### Ziggo Test Pack (stb-tester-test-pack-ziggo/tests/)
+
+| File | Test Function | Description |
+|------|---------------|-------------|
+| `eos_sanity.py` | `test_eos_sanity_5654` | EOS sanity check |
+| `eos_sanity_SoftwareCheck.py` | `test_eos_sanity_softwareversion` | Software version verification |
+| `live_tv_testcases.py` | `test_livetv_pause_and_playback_review_buffer` | Pause and review buffer |
+| `live_tv_testcases.py` | `test_home_radio` | Home radio functionality |
+| `live_tv_testcases.py` | `test_home_PIP_2215` | PIP functionality |
+| `live_tv_testcases.py` | `test_live_tv_wrong_LCN` | Wrong LCN handling |
+| `live_tv_testcases.py` | `test_teletext_availability` | Teletext availability |
+| `live_tv_testcases.py` | `test_teletext_transperancy` | Teletext transparency |
+| `live_tv_testcases.py` | `test_live_tv_record_an_episode` | Record episode |
+| `live_tv_testcases.py` | `test_asset_detailed_page_logo` | Asset detail page logo |
+| `live_tv_testcases.py` | `test_vod_purchase` | VOD purchase flow |
+| `live_tv_testcases.py` | `test_VOD_providers` | VOD providers |
+| `live_tv_testcases.py` | `test_create_delete_profile` | Profile management |
+| `live_tv_testcases.py` | `test_personal_home_posters` | Personal home posters |
+| `tv_guide_testcases.py` | `test_check_info_availability_guide` | Guide info availability |
+| `tv_guide_testcases.py` | `test_PIP_check_guide` | PIP in guide |
+| `tv_guide_testcases.py` | `test_seven_days_availability_guide` | 7-day guide availability |
+| `tv_guide_testcases.py` | `test_fourteen_days_availability_guide` | 14-day guide availability |
+| `tv_guide_testcases.py` | `test_forward_backward_check_guide` | Forward/backward navigation |
+| `tv_guide_testcases.py` | `test_synopsis_guide` | Synopsis display |
+| `tv_guide_testcases.py` | `test_sort_by_genre_guide` | Sort by genre |
+| `tv_guide_testcases.py` | `test_replay_availability_guide` | Replay availability |
+| `kids_section_testcases.py` | `test_kids_section_available` | Kids section availability |
+| `kids_section_testcases.py` | `test_kids_section_enter_and_verify` | Enter kids section |
+| `kids_section_testcases.py` | `test_kids_section_navigation_from_menu` | Kids navigation from menu |
+| `kids_skyshowtime_exploration.py` | `test_kids_skyshowtime_exploration` | Kids SkyShowtime exploration |
+| `tutorial.py` | `test_playback_from_guide` | Playback from guide |
+| `tutorial.py` | `test_menu_navigation_apps` | Menu navigation to apps |
+| `tutorial.py` | `test_menu_navigation_test` | Menu navigation test |
+| `tutorial.py` | `test_find_program_for_rent` | Find program for rent |
+| `tutorial.py` | `test_rent_and_playback` | Rent and playback flow |
+| `tennis_australianopen_testcase.py` | `test_tennis_australianopen_jan31` | Australian Open Jan 31 |
+| `tennis_australianopen_testcase.py` | `test_tennis_navigation_only` | Tennis navigation only |
+| `wintersports_speedskating_testcase.py` | `test_wintersports_speedskating_jan24` | Speed skating Jan 24 |
+| `wintersports_speedskating_testcase.py` | `test_wintersports_navigation_only` | Wintersports navigation |
+| `csxxxx_error_monitoring_testcase.py` | `test_csxxxx_error_monitoring_4hours` | Error monitoring 4 hours |
+| `csxxxx_error_monitoring_testcase.py` | `test_csxxxx_error_monitoring_2min_mock` | Error monitoring 2 min mock |
+| `csxxxx_error_monitoring_testcase.py` | `test_csxxxx_error_monitoring_rtl4_only` | RTL4 error monitoring |
+| `csxxxx_error_monitoring_testcase.py` | `test_csxxxx_error_monitoring_rtl5_only` | RTL5 error monitoring |
+| `csxxxx_error_monitoring_testcase.py` | `test_error_detection_single_check` | Single error detection |
+| `csxxxx_error_monitoring_testcase.py` | `test_channel_switch_recovery_validation` | Channel switch recovery |
+| `csxxxx_error_monitoring_5min_validation.py` | `test_csxxxx_error_monitoring_5min_validation` | 5 min error validation |
+
+### Local Test Pack (stb_tests/)
+
+| File | Test Function | Description |
+|------|---------------|-------------|
+| `test_epg.py` | `test_open_epg_from_home` | Open EPG from home |
+| `test_epg.py` | `test_open_epg_from_live_tv` | Open EPG from live TV |
+| `test_epg.py` | `test_epg_shows_program_information` | EPG shows program info |
+| `test_epg.py` | `test_epg_header_displayed` | EPG header displayed |
+| `test_epg.py` | `test_navigate_channels_down` | Navigate channels down |
+| `test_epg.py` | `test_navigate_channels_up` | Navigate channels up |
+| `test_epg.py` | `test_navigate_time_slots_forward` | Navigate time forward |
+| `test_epg.py` | `test_navigate_time_slots_backward` | Navigate time backward |
+| `test_epg.py` | `test_fast_navigation_with_ff_rewind` | Fast navigation FF/RW |
+| `test_epg.py` | `test_direct_channel_number_entry` | Direct channel entry |
+| `test_epg.py` | `test_select_current_program` | Select current program |
+| `test_epg.py` | `test_select_channel_and_verify_tuning` | Select and verify tuning |
+| `test_epg.py` | `test_navigate_to_past_7_days` | Navigate to past 7 days |
+| `test_epg.py` | `test_navigate_to_future_14_days` | Navigate to future 14 days |
+| `test_epg.py` | `test_pip_available_in_epg` | PIP in EPG |
+| `test_epg.py` | `test_program_synopsis_displayed` | Synopsis displayed |
+| `test_epg.py` | `test_program_title_displayed` | Title displayed |
+| `test_epg.py` | `test_close_epg_with_back_key` | Close EPG with BACK |
+| `test_epg.py` | `test_close_epg_with_home_key` | Close EPG with HOME |
+| `test_epg.py` | `test_replay_icon_displayed_for_past_programs` | Replay icon for past |
+| `test_epg.py` | `test_start_replay_from_epg` | Start replay from EPG |
+| `test_epg.py` | `test_epg_basic_functionality` | EPG basic functionality |
+| `test_epg.py` | `test_epg_channel_surfing` | EPG channel surfing |
+| `test_epg.py` | `test_epg_ocr_validation` | EPG OCR validation |
+| `test_sports_football.py` | `test_navigate_to_sports_and_find_napoli_match` | Sports > Football > Napoli |
+| `test_sports_football.py` | `test_sports_section_accessible` | Sports section accessible |
+| `test_sports_football.py` | `test_direct_navigation_to_football` | Direct navigation to Football |
+| `test_ziggo_menu_navigation.py` | `test_open_menu_from_live_tv` | Open menu from live TV |
+| `test_ziggo_menu_navigation.py` | `test_navigate_to_entertainment` | Navigate to Entertainment |
+| `test_ziggo_menu_navigation.py` | `test_select_and_play_content` | Select and play content |
+| `test_ziggo_menu_navigation.py` | `test_full_journey_menu_to_playback` | Full menu to playback journey |
+| `test_ziggo_menu_navigation.py` | `test_tune_to_channel_1` | Tune to channel 1 |
+| `test_ziggo_menu_navigation.py` | `test_menu_opens` | Menu opens test |
+
+---
+
 ## Workflows
 
 ### Workflow 1: Text-Based Specification
@@ -337,3 +469,69 @@ With a connected device, you can develop tests interactively:
 2. **Navigate**: "Press RIGHT three times and show me"
 3. **Verify**: "What text is visible in the header?"
 4. **Generate**: "Create a test script for what we just did"
+
+---
+
+## Test Execution Workflow
+
+### Running a Test Case
+
+When asked to run a test case, follow this workflow:
+
+1. **Grounding (Verification)**
+   - Search the Test Case Registry above for the requested test
+   - Verify the exact test function name and file path
+   - If test not found, inform user and suggest similar tests
+
+2. **Execute Test**
+   - Use device `stb-tester-48b02d5b0ab7`
+   - Run via Portal API or manual key presses
+   - Capture screenshots to verify results
+
+3. **Report Results**
+   - Show screenshots of key steps
+   - Report pass/fail status
+   - Document any errors encountered
+
+### Creating a New Test Case
+
+When asked to create a new test case:
+
+1. **Build the Test**
+   - Create test file in `stb_tests/` directory
+   - Follow naming convention: `test_<feature>.py`
+   - Include docstrings with Given/When/Then
+
+2. **Test on Device**
+   - Run the test on device `stb-tester-48b02d5b0ab7`
+   - Verify it passes
+   - Capture evidence screenshots
+
+3. **Commit to GitHub**
+   - Git add and commit the new test file
+   - Push to remote repository
+
+4. **UPDATE THIS REGISTRY**
+   - **CRITICAL:** Add the new test case to the Test Case Registry section above
+   - Include: File name, Test function, Description
+   - This ensures the test is discoverable for future runs
+
+### Example Test Run Request
+
+```
+User: "Run the Napoli match test"
+
+Claude:
+1. GROUNDING: Search registry for "napoli"
+   → Found: test_sports_football.py::test_navigate_to_sports_and_find_napoli_match
+
+2. EXECUTE: Run on device stb-tester-48b02d5b0ab7
+   - Press MENU
+   - Navigate to Sports
+   - Navigate to Football
+   - Search for Napoli
+
+3. REPORT: Show screenshots and results
+```
+
+---
