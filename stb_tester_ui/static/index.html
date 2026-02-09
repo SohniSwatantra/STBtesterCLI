@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STB Tester - AI-Powered Testing CLI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-terminal: #0f0f1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-cyan: #66ffff;
+            --accent-green: #66ff66;
+            --accent-magenta: #ff66ff;
+            --accent-yellow: #ffff66;
+            --accent-red: #ff6666;
+            --accent-blue: #6666ff;
+            --accent-orange: #ff9933;
+            --border-color: #333355;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-cyan);
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        .status-dot.disconnected {
+            background: var(--accent-red);
+        }
+
+        .status-dot.connecting {
+            background: var(--accent-yellow);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 2rem;
+            gap: 1rem;
+        }
+
+        /* Terminal output */
+        .terminal-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: var(--bg-secondary);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .terminal-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .terminal-output .input-line {
+            color: var(--accent-magenta);
+            font-weight: bold;
+        }
+
+        .terminal-output .output-line {
+            color: var(--text-primary);
+        }
+
+        .terminal-output .error-line {
+            color: var(--accent-red);
+        }
+
+        /* Input area */
+        .input-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .input-prompt {
+            color: var(--accent-magenta);
+            font-weight: bold;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--accent-orange);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: bold;
+            caret-color: var(--accent-orange);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+            font-weight: normal;
+        }
+
+        .send-btn {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-green);
+        }
+
+        .send-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .quick-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: var(--border-color);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Scrollbar styling */
+        .terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-output::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 0.5rem 2rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">🎬</span>
+            <div class="logo-text">
+                <span class="logo-title">STB Tester</span>
+                <span class="logo-subtitle">AI-Powered Set-Top Box Testing</span>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-dot" id="wsStatus"></span>
+                <span id="wsStatusText">Connecting...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot" id="cliStatus"></span>
+                <span id="cliStatusText">CLI: Starting...</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <span class="terminal-title">CLI Output</span>
+                <div class="terminal-buttons">
+                    <button class="terminal-btn" onclick="clearTerminal()">Clear</button>
+                    <button class="terminal-btn" onclick="restartCLI()">Restart CLI</button>
+                </div>
+            </div>
+            <div class="terminal-output" id="terminal"></div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="quickCommand('/help')">Help</button>
+            <button class="quick-btn" onclick="quickCommand('/status')">Status</button>
+            <button class="quick-btn" onclick="quickCommand('list devices')">List Devices</button>
+            <button class="quick-btn" onclick="quickCommand('take screenshot')">Screenshot</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_HOME')">Home</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_UP')">Up</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_DOWN')">Down</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_LEFT')">Left</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_RIGHT')">Right</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_OK')">OK</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_BACK')">Back</button>
+            <button class="quick-btn" onclick="quickCommand('press KEY_EPG')">EPG</button>
+        </div>
+
+        <div class="input-container">
+            <span class="input-prompt">🎮 You ▶</span>
+            <input
+                type="text"
+                class="input-field"
+                id="inputField"
+                placeholder="Type a command or message..."
+                autofocus
+            >
+            <button class="send-btn" id="sendBtn" onclick="sendInput()">Send</button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        Powered by <a href="https://www.anthropic.com" target="_blank">Claude Agent SDK</a> |
+        STB Tester UI v0.1.0
+    </footer>
+
+    <script>
+        // WebSocket connection
+        let ws = null;
+        let reconnectTimer = null;
+        const terminal = document.getElementById('terminal');
+        const inputField = document.getElementById('inputField');
+        const sendBtn = document.getElementById('sendBtn');
+        const wsStatus = document.getElementById('wsStatus');
+        const wsStatusText = document.getElementById('wsStatusText');
+        const cliStatus = document.getElementById('cliStatus');
+        const cliStatusText = document.getElementById('cliStatusText');
+
+        // Connect to WebSocket
+        function connect() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+            wsStatus.classList.remove('disconnected');
+            wsStatus.classList.add('connecting');
+            wsStatusText.textContent = 'Connecting...';
+
+            ws.onopen = () => {
+                wsStatus.classList.remove('connecting', 'disconnected');
+                wsStatusText.textContent = 'Connected';
+                sendBtn.disabled = false;
+
+                if (reconnectTimer) {
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (e) {
+                    console.error('Failed to parse message:', e);
+                }
+            };
+
+            ws.onclose = () => {
+                wsStatus.classList.add('disconnected');
+                wsStatus.classList.remove('connecting');
+                wsStatusText.textContent = 'Disconnected';
+                sendBtn.disabled = true;
+
+                // Auto-reconnect after 2 seconds
+                reconnectTimer = setTimeout(connect, 2000);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                wsStatus.classList.add('disconnected');
+                wsStatusText.textContent = 'Error';
+            };
+        }
+
+        // Handle incoming messages
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'connected':
+                    appendOutput(`<span style="color:#66ff66">✓ ${data.message}</span><br>`, 'status');
+                    break;
+
+                case 'status':
+                    if (data.pid) {
+                        cliStatus.classList.remove('disconnected', 'connecting');
+                        cliStatusText.textContent = `CLI: Running (PID ${data.pid})`;
+                    }
+                    appendOutput(`<span style="color:#66ff66">✓ ${data.message}</span><br>`, 'status');
+                    break;
+
+                case 'output':
+                    appendOutput(data.html, 'output');
+                    break;
+
+                case 'input':
+                    // Input is already shown in CLI output
+                    break;
+
+                case 'error':
+                    appendOutput(`<span style="color:#ff6666">${data.html || data.message}</span><br>`, 'error');
+                    break;
+
+                default:
+                    console.log('Unknown message type:', data);
+            }
+        }
+
+        // Append output to terminal
+        function appendOutput(html, type) {
+            const div = document.createElement('div');
+            div.className = `${type}-line`;
+            div.innerHTML = html;
+            terminal.appendChild(div);
+
+            // Auto-scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Send input to CLI
+        function sendInput() {
+            const text = inputField.value.trim();
+            if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+
+            ws.send(JSON.stringify({
+                type: 'input',
+                text: text
+            }));
+
+            inputField.value = '';
+        }
+
+        // Quick command buttons
+        function quickCommand(cmd) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            ws.send(JSON.stringify({
+                type: 'input',
+                text: cmd
+            }));
+        }
+
+        // Clear terminal
+        function clearTerminal() {
+            terminal.innerHTML = '';
+        }
+
+        // Restart CLI
+        function restartCLI() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            cliStatus.classList.add('connecting');
+            cliStatusText.textContent = 'CLI: Restarting...';
+
+            ws.send(JSON.stringify({
+                type: 'restart'
+            }));
+        }
+
+        // Handle Enter key
+        inputField.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendInput();
+            }
+        });
+
+        // Initialize
+        connect();
+    </script>
+</body>
+</html>
